@@ -1,6 +1,6 @@
 import './style.scss'
 import draggable from 'vuedraggable'
-import { defineComponent, PropType } from "@vue/runtime-core";
+import { defineComponent, PropType } from "vue";
 import compMask from './mask'
 export default  defineComponent({
   name: 'components-draggable',

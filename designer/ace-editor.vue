@@ -4,7 +4,7 @@
 
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue-demi'
+import { defineComponent, onMounted } from 'vue'
 export default defineComponent({
   name: 'AceEditor',
 })
@@ -30,6 +30,7 @@ onMounted(() => {
   editor.on('change', () => {
     emits('update:modelValue', editor.getValue())
   })
+  props.modelValue && editor.session.setValue(props.modelValue)
 })
 function beauty() {
   const session = editor.getSession();

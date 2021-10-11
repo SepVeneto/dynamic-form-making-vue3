@@ -1,4 +1,4 @@
-import { defineComponent, PropType } from "vue-demi";
+import { defineComponent, PropType } from 'vue';
 import dynamicFormItem from './dynamic-form-item';
 
 export default defineComponent({

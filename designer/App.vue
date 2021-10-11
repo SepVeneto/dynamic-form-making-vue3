@@ -1,8 +1,7 @@
 <script lang="tsx">
 // This starter template is using Vue 3 <script setup> SFCs
 
-import { ref } from "@vue/reactivity";
-import { defineComponent } from "@vue/runtime-core";
+import { ref, defineComponent } from "vue";
 import draggable from 'vuedraggable'
 import componentsDraggable from "./components/components-draggable";
 import templateCode from './components/templateCode'
@@ -10,7 +9,7 @@ import { h, watch, computed, onMounted } from 'vue';
 import render from "./render";
 import { useStore } from "./store";
 import renderConfig from "./components/renderConfig";
-import dynamicForm from './components/dynamic-form'
+// import dynamicForm from '../packages/dynamic-form/dynamic-form'
 import generateCode from './components/generateCode'
 import aceEditor from './ace-editor.vue'
 // import 'ace-builds'
@@ -21,7 +20,7 @@ export default defineComponent({
     draggable,
     componentsDraggable,
     templateCode,
-    dynamicForm,
+    // dynamicForm,
     aceEditor,
   },
   setup() {
@@ -55,6 +54,14 @@ export default defineComponent({
     })
     const fakeData = ref({})
     const preview = ref(false)
+    function handleDownload() {
+      window.parent.postMessage({
+        action: 'download',
+        data: {
+          code: code.value,
+        }
+      }, '*')
+    }
     function handleBeauty() {
       aceRef.value.beauty();
     }
@@ -75,12 +82,10 @@ export default defineComponent({
       const data = aceRef.value.getContent()
       fakeData.value = JSON.parse(data);
       fakeDataView.value = false;
-      console.log(fakeData.value)
     }
     const jsonView = ref(false);
-    const jsonConfig = ref();
+    const jsonConfig = ref('');
     function handleJsonConfirm() {
-      console.log(jsonConfig.value)
       config.value = JSON.parse(jsonConfig.value);
     }
     return () => (
@@ -144,9 +149,10 @@ export default defineComponent({
         <pre style="text-align: left;">{JSON.stringify(config.value, null, 2)}</pre>
         <el-dialog v-model={codeView.value} destroy-on-close>
           <ace-editor v-model={code.value}/>
+          <el-button type="text" onClick={handleDownload}>下载文件</el-button>
         </el-dialog>
         <el-dialog v-model={fakeDataView.value} destroy-on-close>
-          <ace-editor ref={aceRef} type="json" v-model={fakeData.value} />
+          <ace-editor ref={aceRef} type="json" modelValue={JSON.stringify(fakeData.value)} />
           <el-button type="primary" onClick={handleConfirm}>确定</el-button>
         </el-dialog>
         <el-dialog v-model={jsonView.value} destroy-on-close>
@@ -165,7 +171,6 @@ export default defineComponent({
   }
 })
 </script>
-
 
 <style>
 #app {
