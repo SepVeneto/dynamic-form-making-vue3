@@ -1,6 +1,7 @@
-import { InjectionKey } from 'vue-demi';
+import { InjectionKey } from 'vue';
 import { createStore, Store, useStore as baseStore } from 'vuex'
 interface State {
+  id: number,
   config: Config,
   current: RenderCell,
 }
@@ -25,22 +26,11 @@ function findParent(list: RenderCell[], key: string): RenderCell[] | false {
     }
   }
   return false
-  // return false;
-  // list.forEach(item => {
-  //   if (item.prop === key) {
-  //     res = list;
-  //     return res;
-  //   }
-  //   if (item.elements && item.elements.length > 0) {
-  //     res = findParent(item.elements, key);
-  //     return res;
-  //   }
-  // })
-  // return res;
 }
 
 const store = createStore<State>({
   state: {
+    id: 0,
     config: {
       config: {},
       data: [],
@@ -48,6 +38,9 @@ const store = createStore<State>({
     current: {} as RenderCell,
   },
   mutations: {
+    INCREASE_ID(state) {
+      state.id += 1;
+    },
     DELETE_CONFIG(state, data) {
       const parent = findParent(state.config.data, data.prop)
       if (!parent) {
@@ -58,14 +51,15 @@ const store = createStore<State>({
     },
     COPY_CONFIG(state, data) {
       const parent = findParent(state.config.data, data.prop)
-      console.log(parent)
       if (!parent) {
         return;
       }
       parent.push({
         ...data,
-        prop: `${data.prop}-${Date.now()}`,
+        id: state.id,
+        prop: `${data.type}-${Date.now()}`,
       })
+      store.commit('INCREASE_ID');
     },
     UPDATE_CONFIG(state, config) {
       state.config = config;
@@ -73,7 +67,7 @@ const store = createStore<State>({
     UPDATE_SELECT(state, data) {
       state.current = data;
     }
-  }
+  },
 })
 
 export default store;

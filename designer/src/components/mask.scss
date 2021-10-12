@@ -1,0 +1,64 @@
+.mask-wrap {
+  --normal: #409eff;
+  --layout: #e6a23c;
+  --normal-light: rgba(236, 245, 255, 0.3);
+  --layout-light: rgba(253, 246, 236, 0.3);
+
+  padding: 6px;
+  border: 1px dashed var(--normal);
+  background: var(--normal-light);
+  position: relative;
+  .mask {
+    cursor: move;
+    &::after {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
+  .operate {
+    display: none;
+    .icon {
+      cursor: pointer;
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--normal);
+      color: #fff;
+    }
+  }
+  // &:focus {
+  &.is-selected {
+    border: 2px solid var(--normal);
+  }
+  // &:focus > .operate {
+  &.is-selected > .operate {
+    display: block;
+    position: absolute;
+    top: 0;
+    cursor: pointer;
+    &.more {
+      right: 0;
+    }
+    &.move {
+      cursor: move;
+      left: 0;
+    }
+  }
+}
+.mask-wrap.is-layout {
+  border-color: var(--layout);
+  background: var(--layout-light);
+  cursor: move;
+}
+.mask-wrap.is-layout.is-selected {
+  & > .operate .icon {
+    background: var(--layout);
+  }
+}

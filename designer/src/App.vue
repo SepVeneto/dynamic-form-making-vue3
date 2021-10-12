@@ -1,11 +1,10 @@
 <script lang="tsx">
 // This starter template is using Vue 3 <script setup> SFCs
 
-import { ref, defineComponent } from "vue";
+import { ref, defineComponent, computed, watch } from "vue";
 import draggable from 'vuedraggable'
 import componentsDraggable from "./components/components-draggable";
 import templateCode from './components/templateCode'
-import { h, watch, computed, onMounted } from 'vue';
 import render from "./render";
 import { useStore } from "./store";
 import renderConfig from "./components/renderConfig";
@@ -32,10 +31,6 @@ export default defineComponent({
     watch(() => config.value, (config) => {
       store.commit('UPDATE_CONFIG', config)
     }, { deep: true })
-    // const config = ref<any>({
-    //   data: [],
-    //   config: {},
-    // })
     const data = {
       name: 'venento',
     }
@@ -54,6 +49,27 @@ export default defineComponent({
     })
     const fakeData = ref({})
     const preview = ref(false)
+    function getId() {
+      const id = store.state.id;
+      store.commit('INCREASE_ID');
+      return id;
+    }
+    function handleClone(data: Cell) {
+      if (data.prop === 'layout') {
+        return {
+          id: getId(),
+          type: data.prop,
+          prop: `${data.prop}-${Date.now()}`,
+          elements: [{ col: 12, elements: [] }, { col: 12, elements: [] }]
+        }
+      }
+      return {
+        id: getId(),
+        type: data.prop,
+        label: data.label,
+        prop: `${data.prop}-${Date.now()}`
+      };
+    }
     function handleDownload() {
       window.parent.postMessage({
         action: 'download',
@@ -81,6 +97,7 @@ export default defineComponent({
     function handleConfirm() {
       const data = aceRef.value.getContent()
       fakeData.value = JSON.parse(data);
+      console.log(fakeData.value)
       fakeDataView.value = false;
     }
     const jsonView = ref(false);
@@ -103,32 +120,21 @@ export default defineComponent({
                 item: elements
               }}
               item-key="prop"
-              group={{name:'detail', pull: 'clone'}}
-              clone={(data: Cell) => {
-                if (data.prop === 'layout') {
-                  return {
-                    type: data.prop,
-                    prop: `${data.prop}-${Date.now()}`,
-                    elements: [{ col: 12, elements: [] }, { col: 12, elements: [] }]
-                  }
-                }
-                return {
-                  type: data.prop,
-                  label: data.label,
-                  prop: `${data.prop}-${Date.now()}`
-                };
-              }}
+              sort={false}
+              group={{name:'detail', pull: 'clone', put: false}}
+              clone={(data: Cell) => handleClone(data)}
             />
           </el-col>
           <el-col span={14}>
           {
             <components-draggable
-            class="edit-area"
-            style="flex: 1"
-            list={config.value.data}
-            item-key="prop"
-            group={{name:'detail'}}
-            data={data}
+              class="edit-area"
+              style="flex: 1"
+              list={config.value.data}
+              item-key="id"
+              group={{name:'detail'}}
+              data={data}
+              ghost-class="detail-ghost"
             />
           }
           </el-col>
@@ -152,7 +158,7 @@ export default defineComponent({
           <el-button type="text" onClick={handleDownload}>下载文件</el-button>
         </el-dialog>
         <el-dialog v-model={fakeDataView.value} destroy-on-close>
-          <ace-editor ref={aceRef} type="json" modelValue={JSON.stringify(fakeData.value)} />
+          <ace-editor ref={aceRef} type="json" modelValue={JSON.stringify(fakeData.value, null, 2)} />
           <el-button type="primary" onClick={handleConfirm}>确定</el-button>
         </el-dialog>
         <el-dialog v-model={jsonView.value} destroy-on-close>

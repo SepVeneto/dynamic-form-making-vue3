@@ -20,7 +20,12 @@ export default  defineComponent({
       <draggable
         {...context.attrs}
         list={props.list}
-        item-key='prop'
+        item-key='id'
+        tag="transition-group"
+        component-data={{
+          tag: 'div',
+          name: 'list'
+        }}
         v-slots={{
           item: ({element}: {element: RenderCell}) => {
             if (element.type === 'layout') {
@@ -30,12 +35,18 @@ export default  defineComponent({
                 >
                   <el-row>
                     {element.elements?.map(item => (
-                      <el-col span={item.col} class="mask-wrap">
+                      <el-col
+                        span={item.col}
+                        class="mask-wrap is-layout"
+                        style="background: #fff;"
+                      >
                         <components-draggable
                           class="draggable-area"
                           list={item.elements}
                           data={props.data}
+                          item-key="id"
                           group={{name:'detail'}}
+                          ghost-class="detail-ghost"
                         >
                         </components-draggable>
                       </el-col>

@@ -1,0 +1,30 @@
+.col-wrapper {
+  border: 1px dashed crimson;
+  min-height: 10px;
+}
+.draggable-area {
+  height: 100%;
+  width: 100%;
+  min-height: 44px;
+}
+.detail-ghost {
+  height: 0px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden;
+  border-color:  crimson;
+  border-width: 2px !important;
+  border-style: solid !important;
+  background-color: crimson;
+  content: '';
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.2s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}

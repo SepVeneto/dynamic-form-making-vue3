@@ -3,6 +3,7 @@ declare interface Config {
   config: Record<string, unknown>
 }
 declare interface RenderCell {
+  id: number,
   type: string,
   col?: number,
   elements?: RenderCell[],
