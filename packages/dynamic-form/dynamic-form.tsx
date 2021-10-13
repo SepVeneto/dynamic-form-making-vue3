@@ -1,5 +1,6 @@
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, PropType, computed } from 'vue';
 import dynamicFormItem from './dynamic-form-item';
+import { extractObject } from './tools';
 
 export default defineComponent({
   name: 'dynamic-form',
@@ -12,11 +13,15 @@ export default defineComponent({
     dynamicFormItem
   },
   setup(props, context) {
+    const formProps = computed(() => {
+      // return extractObject(props.config!, ['config', 'data'], 'exclude')
+      return props.config!.config;
+    })
     return () => (
-      <el-form {...props.config}>
+      <el-form {...formProps.value} model={props.modelValue}>
         {props.config?.data.map(item => (
           <dynamic-form-item
-            config={item} data={props.modelValue}
+            config={item} data={props.modelValue} v-slots={context.slots}
             {...{
               'onUpdate:modelValue': (val: string) => context.emit('update:modelValue', val)
             }}

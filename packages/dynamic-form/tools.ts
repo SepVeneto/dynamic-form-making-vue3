@@ -30,3 +30,20 @@ export function setValue(data: Record<string, any>, key: string, value: any): vo
   }
   dataP[path[path.length - 1]] = value;
 }
+
+export function extractObject(obj: Record<string, any>, keys: string[], action: 'include' | 'exclude' = 'include') {
+  const res: Record<string, any> = {};
+  Object.entries(obj).forEach(([key, value]) => {
+    if (action === 'include' && keys.includes(key)) {
+      res[key] = value;
+    }
+    if (action === 'exclude') {
+      if (keys.includes(key)) {
+        return;
+      } else {
+        res[key] = value;
+      }
+    }
+  })
+  return res;
+}

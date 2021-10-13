@@ -57,8 +57,9 @@ export default  defineComponent({
             } else if (element.type === 'text') {
               return (
                 <comp-mask data={element} mask>
-                  <span>{element.label}</span>
-                  <span>{props.data[element.prop as string]}</span>
+                  <el-form-item {...element}>
+                    <span>{props.data[element.prop as string]}</span>
+                  </el-form-item>
                 </comp-mask>
               )
             } else if (element.type === 'input') {
@@ -67,7 +68,9 @@ export default  defineComponent({
                   mask
                   data={element}
                 >
-                  <el-input />
+                  <el-form-item {...element}>
+                    <el-input />
+                  </el-form-item>
                   </comp-mask>
                 )
             }
