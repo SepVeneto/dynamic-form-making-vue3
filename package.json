@@ -6,7 +6,7 @@
   ],
   "scripts": {
     "dev": "pnpm -C designer dev",
-    "build": "vue-tsc --noEmit --skipLibCheck && vite build",
+    "build": "pnpm -C designer build",
     "serve": "vite preview",
     "build:form": "esno ./build/index.ts",
     "build:forms": "gulp -f ./build/gulpfile.ts",
