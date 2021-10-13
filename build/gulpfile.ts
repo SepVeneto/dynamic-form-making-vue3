@@ -2,6 +2,7 @@ import path from 'path'
 import fs from 'fs/promises'
 import { spawn } from 'child_process'
 import { series, parallel } from 'gulp'
+// import { Project } from 'ts-morph'
 
 async function run(command: string, cwd: string = '') {
   new Promise<void>((resolve, reject) => {
@@ -30,15 +31,54 @@ async function run(command: string, cwd: string = '') {
     process.on('exit', onProcessExit)
   })
 }
+// async function generateTypes() {
+//   const project = new Project({
+//     compilerOptions: {
+//       allowJs: true,
+//       declaration: true,
+//       emitDeclarationOnly: true,
+//       noEmitOnError: true,
+//       out: path.resolve(__dirname, '../dist'),
+//       baseUrl: path.resolve(__dirname, '..'),
+//       skipLibCheck: true,
+//     },
+//     tsConfigFilePath: path.resolve(__dirname, '../tsconfig.json'),
+//     skipAddingFilesFromTsConfig: true,
+//   })
+// }
 async function copyConfig() {
-  await fs.mkdir(path.resolve(__dirname, '../dist'))
-  await run(`cp ${path.resolve(__dirname, '../packages/dynamic-form/package.json')} ${path.resolve(__dirname, '../dist/package.json')}`)
+  await fs.mkdir(path.resolve(__dirname, '../dist/lib'), { recursive: true })
+  const packageJson = await fs.readFile(path.resolve(__dirname, '../packages/dynamic-form/package.json'), {
+    encoding: 'utf-8',
+  })
+  const res = packageJson.replace(/index\.ts/, 'lib/index.js');
+  await fs.writeFile(path.resolve(__dirname, '../dist/package.json'), res, {
+    encoding: 'utf-8'
+  })
+  await run(`cp ${path.resolve(__dirname, '../packages/dynamic-form/index.d.ts')} ${path.resolve(__dirname, '../dist/lib')}`)
+//   await fs.writeFile(path.resolve(__dirname, '../dist/global.d.ts'), `
+// declare module 'vue' {
+//   export interface GlobalComponents {
+//     DynamicForm: typeof import('./index.es.js')
+//   }
+// }
+//   `)
 }
 async function build() {
   await run(`pnpm run build:form`)
 }
+async function clear() {
+  try {
+    await fs.rm(path.resolve(__dirname, '../dist'), { recursive: true })
+  } catch(err) {
+    console.error(err)
+  }
+}
 
 export default series(
+  parallel(
+    clear,
+  ),
   parallel(
     build,
     copyConfig

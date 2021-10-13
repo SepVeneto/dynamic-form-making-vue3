@@ -33,7 +33,7 @@ async function build() {
     }
     const esm = {
       format: 'es',
-      file: path.resolve(distPath, 'index.es.js'),
+      file: path.resolve(distPath, 'lib', 'index.js'),
     }
     const bundle = await rollup.rollup(rollupConfig);
     await bundle.write(esm as any);
