@@ -1,1 +1,0 @@
-export declare const install: (app: import('vue').App<any>) => void;

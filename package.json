@@ -1,44 +1,16 @@
 {
-  "private": true,
-  "workspaces": [
-    "packages/*",
-    "designer"
-  ],
+  "name": "dynamic-form",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.ts",
+  "bin": "",
   "scripts": {
-    "dev": "pnpm -C designer dev",
-    "build": "pnpm -C designer build",
-    "serve": "vite preview",
-    "build:form": "esno ./build/index.ts",
-    "build:forms": "gulp -f ./build/gulpfile.ts",
-    "pack:form": "cd ./dist && pnpm pack --pack-destination ../",
-    "gh-pages": "git subtree push --prefix designer/dist origin gh-pages"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {
-    "dynamic-form": "workspace:*",
-    "element-plus": "^1.1.0-beta.18",
-    "slate": "^0.66.5",
-    "vue": "^3.2.16",
-    "vuedraggable": "^4.1.0",
-    "vuex": "^4.0.2"
-  },
-  "devDependencies": {
-    "@rollup/plugin-typescript": "^8.2.5",
-    "@types/gulp": "^4.0.9",
-    "@types/node": "^16.10.3",
-    "@vitejs/plugin-vue": "^1.9.2",
-    "@vitejs/plugin-vue-jsx": "^1.2.0",
-    "esno": "^0.10.1",
-    "gulp": "4",
-    "gulp-typescript": "^6.0.0-alpha.1",
-    "rollup": "^2.58.0",
-    "rollup-plugin-esbuild": "^4.5.0",
-    "rollup-plugin-vue": "^6.0.0",
-    "sass": "^1.42.1",
-    "ts-morph": "^12.0.0",
-    "ts-node": "^10.3.0",
-    "tslib": "^2.3.1",
-    "typescript": "^4.4.3",
-    "vite": "^2.6.0",
-    "vue-tsc": "^0.28.0"
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "element-plus": "^1.1.0-beta.20",
+    "vue": "^3.2.20"
   }
 }
