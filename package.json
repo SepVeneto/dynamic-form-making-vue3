@@ -11,7 +11,7 @@
     "build:form": "esno ./build/index.ts",
     "build:forms": "gulp -f ./build/gulpfile.ts",
     "pack:form": "cd ./dist && pnpm pack --pack-destination ../",
-    "gh-pages": "git subtree push --prefix dist origin gh-pages"
+    "gh-pages": "git subtree push --prefix designer/dist origin gh-pages"
   },
   "dependencies": {
     "dynamic-form": "workspace:*",
