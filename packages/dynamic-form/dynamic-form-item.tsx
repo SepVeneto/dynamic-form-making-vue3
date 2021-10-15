@@ -44,7 +44,7 @@ export default defineComponent({
       <span>{value.value}</span>
     )
     const input = () => (
-      <el-input v-model={value.value} />
+      <el-input {...config.value} v-model={value.value} />
     )
     const itemMap: Record<string, any> = {
       text,
@@ -52,7 +52,7 @@ export default defineComponent({
     }
     const getRenderItem = () => (
       <render-form-item config={config.value} v-slots={context.slots}>
-        {itemMap[config.value.type]?.()}
+        {itemMap[config.value.type]?.(config.value)}
       </render-form-item>
     )
     return () => {
