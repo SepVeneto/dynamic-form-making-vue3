@@ -27,6 +27,18 @@ export default defineComponent({
       data: [],
       config: {}
     })
+    window.addEventListener('message', event => {
+      const { action, data } = event.data;
+      switch(action) {
+        case 'config':
+          config.value = JSON.parse(data)
+          break;
+      }
+    })
+    window.parent.postMessage({
+      action: 'getConfig'
+    }, '*')
+    // config.value = JSON.parse(sessionStorage.getItem('config') ?? JSON.stringify(config.value))
     const store = useStore();
     watch(() => config.value, (config) => {
       store.commit('UPDATE_CONFIG', config)
