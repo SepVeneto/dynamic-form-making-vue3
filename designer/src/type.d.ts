@@ -1,5 +1,5 @@
 declare interface Config {
-  data: RenderCell[],
+  data: Cell[],
   config: Record<string, unknown>
 }
 declare interface RenderCell {
@@ -12,6 +12,7 @@ declare interface RenderCell {
   columns?: RenderCell[],
 }
 declare interface Cell {
+  id?: string,
   label: string,
   prop: string,
   component?: any,

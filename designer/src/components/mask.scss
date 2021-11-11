@@ -21,7 +21,7 @@
     }
   }
   .operate {
-    display: none;
+    // display: none;
     .icon {
       cursor: pointer;
       width: 20px;
@@ -38,7 +38,7 @@
     border: 2px solid var(--normal);
   }
   // &:focus > .operate {
-  &.is-selected > .operate {
+  & > .operate {
     display: block;
     position: absolute;
     top: 0;

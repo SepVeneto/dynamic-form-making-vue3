@@ -10,5 +10,11 @@ export default defineConfig({
       strict: true,
     }
   },
+  resolve: {
+    alias: {
+      'vue': 'vue/dist/vue.esm-bundler.js',
+      '@': path.resolve(__dirname, 'src')
+    }
+  },
   plugins: [vue(), vueJsx()]
 })

@@ -13,6 +13,10 @@
   "license": "ISC",
   "devDependencies": {
     "@element-plus/icons": "^0.0.11",
+    "@types/dragula": "^3.7.1",
     "basic-components": "file:lib\\basic-components-1.0.0.tgz"
+  },
+  "dependencies": {
+    "dragula": "^3.7.3"
   }
 }
