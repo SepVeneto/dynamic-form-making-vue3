@@ -17,8 +17,7 @@
     "element-plus": "^1.1.0-beta.18",
     "slate": "^0.66.5",
     "vue": "^3.2.16",
-    "vuedraggable": "^4.1.0",
-    "vuex": "^4.0.2"
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.2.5",

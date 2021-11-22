@@ -17,6 +17,13 @@
     "basic-components": "file:lib\\basic-components-1.0.0.tgz"
   },
   "dependencies": {
-    "dragula": "^3.7.3"
+    "@types/sortablejs": "^1.10.7",
+    "@types/uuid": "^8.3.1",
+    "dragula": "^3.7.3",
+    "dropzone": "^6.0.0-beta.1",
+    "pinia": "^2.0.3",
+    "sortablejs": "^1.14.0",
+    "storablejs": "^0.0.20",
+    "uuid": "^8.3.2"
   }
 }

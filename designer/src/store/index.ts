@@ -1,73 +1,62 @@
-import { InjectionKey } from 'vue';
-import { createStore, Store, useStore as baseStore } from 'vuex'
-interface State {
-  id: number,
-  config: Config,
-  current: RenderCell,
+import { defineStore } from "pinia";
+
+export interface IDomTree {
+  id: string,
+  tag: string,
+  attributes?: Record<string, any>,
+  children: IDomTree[],
 }
 
-export const key: InjectionKey<Store<State>> = Symbol()
-
-export function useStore() {
-  return baseStore(key)
-}
-
-function findParent(list: RenderCell[], key: string): RenderCell[] | false {
-  let res: RenderCell[] | boolean = false;
-  for (let i = 0; i < list.length; ++i) {
-    if (list[i].prop === key) {
-      return list;
-    }
-    if (list[i].elements) {
-      const res = findParent(list[i].elements as RenderCell[], key)
-      if (res) {
-        return res;
+export const useWidgetsStore = defineStore('widgets', {
+  state: () => ({
+    'el-input': {
+      snippets: `<el-input />`,
+      attrs: {},
+    },
+    'el-form': {
+      snippets: '',
+      attrs: {
+        class: 'form-wrap drag-box draggable',
+        style: 'padding: 10px'
       }
-    }
-  }
-  return false
-}
-
-const store = createStore<State>({
-  state: {
-    id: 0,
-    config: {
-      config: {},
-      data: [],
     },
-    current: {} as RenderCell,
-  },
-  mutations: {
-    INCREASE_ID(state) {
-      state.id += 1;
-    },
-    DELETE_CONFIG(state, data) {
-      const parent = findParent(state.config.data, data.prop)
-      if (!parent) {
-        return;
+    'el-form-item': {
+      snippets: '',
+      attrs: {
+        class: 'form-wrap drag-box draggable',
+        style: 'padding: 10px; border-color: blue',
+        label: '示例文本'
       }
-      const index = parent.findIndex(item => item.prop === data.prop);
-      parent.splice(index, 1);
     },
-    COPY_CONFIG(state, data) {
-      const parent = findParent(state.config.data, data.prop)
-      if (!parent) {
-        return;
+    'el-select': { attrs: {}, snippets: '', },
+    span: {
+      snippets: '<span>示例文本</span>',
+      attrs: {
+        class: 'draggable',
       }
-      parent.push({
-        ...data,
-        id: state.id,
-        prop: `${data.type}-${Date.now()}`,
-      })
-      store.commit('INCREASE_ID');
     },
-    UPDATE_CONFIG(state, config) {
-      state.config = config;
+    'el-col': {
+      snippets: '',
+      attrs: {
+        class: 'drag-box layout-col',
+        span: 12
+      }
     },
-    UPDATE_SELECT(state, data) {
-      state.current = data;
+    'el-row': {
+      snippets: '',
+      attrs: {
+        class: 'draggable layout-row'
+      }
+    },
+    Layout: {
+      attrs: {},
+      snippets: `<el-row><el-col></el-col></el-row>`
     }
-  },
+  })
 })
 
-export default store;
+export const useDomTreeStore = defineStore('domTree', {
+  state: (): { domTree: IDomTree[] } => ({
+    domTree: []
+  }),
+})

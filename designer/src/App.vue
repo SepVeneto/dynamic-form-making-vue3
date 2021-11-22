@@ -1,239 +1,318 @@
-<script lang="tsx">
-// This starter template is using Vue 3 <script setup> SFCs
-import { ref, defineComponent, computed, watch, nextTick, onMounted } from "vue";
-import type { App } from 'vue'
-import draggable from 'vuedraggable'
-import componentsDraggable from "./components/components-draggable";
-import templateCode from './components/templateCode'
-import {compile} from "./render";
-import { useStore } from "./store";
-import renderConfig from "./components/renderConfig";
-// import dynamicForm from '../packages/dynamic-form/dynamic-form'
-import generateCode from './components/generateCode'
-import aceEditor from './ace-editor.vue'
-import { useDragula } from "./hooks/dragula";
-// import 'ace-builds'
-
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-export default defineComponent({
-  components: {
-    draggable,
-    componentsDraggable,
-    templateCode,
-    // dynamicForm,
-    aceEditor,
-  },
-  setup() {
-    const config = ref<Config>({
-      data: [],
-      config: {}
-    })
-    window.addEventListener('message', event => {
-      const { action, data } = event.data;
-      switch(action) {
-        case 'config':
-          config.value = JSON.parse(data)
-          break;
-      }
-    })
-    window.parent.postMessage({
-      action: 'getConfig'
-    }, '*')
-    // config.value = JSON.parse(sessionStorage.getItem('config') ?? JSON.stringify(config.value))
-    // const store = useStore();
-    // watch(() => config.value, (config) => {
-    //   store.commit('UPDATE_CONFIG', config)
-    // }, { deep: true })
-    // const data = {
-    //   name: 'venento',
-    // }
-    const dropRef = ref();
-    const leftRef = ref();
-    onMounted(() => {
-      useDragula(leftRef.value, dropRef.value);
-    })
-    const components = ref<Cell[]>([
-      {label: '文本', prop: 'text', component: '<span>文本</span>' },
-      {label: '输入框', prop: 'input', component: `<el-input />`},
-      {label: '栅格', prop: 'layout', component: `<el-row>
-      <el-col
-        class="mask-wrap is-layout"
-        style="background: #fff;"
-      :span="12">
-        </el-col>
-        <el-col
-          class="mask-wrap is-layout"
-          style="background: #fff;"
-          :span="12"
-        >
-        </el-col>
-      </el-row>`}
-    ])
-
-    const code = computed(() => {
-      return generateCode(config.value)
-    })
-    const fakeData = ref({})
-    function onDragstart(e: DragEvent, cell: Cell) {
-      e.dataTransfer?.setData('code',
-        JSON.stringify({ origin: 'sidebar', cell: { ...cell, id: `${cell.prop}-${Date.now()}` } })
-      )
-    }
-    function onDragover(e: DragEvent) {
-      e.preventDefault();
-      e.dataTransfer!.dropEffect = 'move'
-    }
-    function onDrop(e: DragEvent) {
-      e.preventDefault();
-      if (!e.dataTransfer) {
-        return;
-      }
-      const data = e.dataTransfer.getData('code');
-      if (!data) {
-        return;
-      }
-      const dataTransfer = JSON.parse(data!);
-      if (dataTransfer.origin === 'sidebar') {
-        const code = dataTransfer.cell;
-        config.value.data.push(code);
-      } else if (dataTransfer.origin === 'dropArea') {
-        const origin = dataTransfer.cell;
-        const originId = origin.id!;
-        const target = e.target as HTMLElement;
-        const targetId = target.dataset.id;
-        const index = config.value.data.findIndex(item => item.id === targetId)
-        const originIndex = config.value.data.findIndex(item => item.id === originId)
-        config.value.data.splice(originIndex, 1);
-        config.value.data.splice(index, 0, origin);
-      }
-      const el = dropRef.value;
-      app.value?.unmount();
-      app.value = compile(config.value.data)
-      nextTick().then(() => {
-        app.value?.mount(el)
-      })
-    }
-    const app = ref<App>();
-    function getId() {
-      // const id = store.state.id;
-      // store.commit('INCREASE_ID');
-      // return id;
-    }
-    function handleClone(data: Cell) {
-      if (data.prop === 'layout') {
-        return {
-          id: getId(),
-          type: data.prop,
-          prop: `${data.prop}-${Date.now()}`,
-          elements: [{ col: 12, elements: [] }, { col: 12, elements: [] }]
-        }
-      }
-      return {
-        id: getId(),
-        type: data.prop,
-        label: data.label,
-        prop: `${data.prop}-${Date.now()}`
-      };
-    }
-    function handleDownload() {
-      window.parent.postMessage({
-        action: 'download',
-        data: {
-          code: code.value,
-        }
-      }, '*')
-    }
-    function handleBeauty() {
-      aceRef.value.beauty();
-    }
-    function extractProp(config: RenderCell[]) {
-      config.forEach(item => {
-        const path = item.prop?.split('.') ?? [];
-        if (path.length > 1) {
-
-        }
-      })
-    }
-    const fakeDataView = ref(false)
-    function handleGenerateData() {
-      fakeDataView.value = true 
-    }
-    const aceRef = ref();
-    function handleConfirm() {
-      const data = aceRef.value.getContent()
-      fakeData.value = JSON.parse(data);
-      console.log(fakeData.value)
-      fakeDataView.value = false;
-    }
-    const jsonView = ref(false);
-    const jsonConfig = ref('');
-    function handleJsonConfirm() {
-      config.value = JSON.parse(jsonConfig.value);
-    }
-    return () => (
-      <div>
-        <div ref={leftRef} class="left">
-          {components.value.map(item => (
-            // <div draggable onDragstart={(e) => onDragstart(e, item)}>{item.label}</div>
-            <div data-comp={item.prop}>{item.label}</div>
-          ))}
-        </div>
-        <div
-          ref={dropRef}
-          class="drop-area"
-          // onDragover={onDragover}
-          // onDrop={onDrop}
-        ></div>
-        {
-          // <template-code config={config} style="flex: 1" />
-        }
-        <pre style="text-align: left;">{JSON.stringify(config.value, null, 2)}</pre>
+<template>
+  <div style="display: flex; column-gap: 20px; margin: 0 100px">
+    <div class="widget-area">
+      <div class="widget-box">
+        <span data-tag="el-form" data-type="layout">表单</span>
       </div>
-    )
-  }
+      <div class="widget-box">
+        <span data-tag="el-form-item" data-type="layout">表单域</span>
+      </div>
+      <div class="widget-box">
+        <span data-tag="el-input" data-type="comp">输入框</span>
+      </div>
+      <div class="widget-box">
+        <span data-tag="el-select" data-type="comp">选择器</span>
+      </div>
+      <div class="widget-box">
+        <span data-tag="span" data-type="comp">文本</span>
+      </div>
+      <div class="widget-box">
+        <span data-tag="el-row" data-type="layout">row</span>
+      </div>
+      <div class="widget-box">
+        <span data-tag="el-col" data-type="comp">col</span>
+      </div>
+      <div class="widget-box">
+        <span data-tag="Layout" data-type="layout">栅格</span>
+      </div>
+    </div>
+    <el-tree
+      ref="treeRef"
+      node-key="id"
+      :data="treeNode"
+      :props="treeProps"
+      draggable
+      default-expand-all
+    >
+    </el-tree>
+    <div class="drag-box drop-area" ref="dropRef">
+    </div>
+    <el-tabs style="flex:1">
+      <el-tab-pane label="表单配置">
+        <el-form @submit.prevent>
+          <el-form-item label="label-width">
+            <!-- <el-input v-model="widgetsStore.ElForm.labelWidth" @change="renderer" /> -->
+          </el-form-item>
+        </el-form>
+      </el-tab-pane>
+      <el-tab-pane label="表单域配置"></el-tab-pane>
+    </el-tabs>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue'
+export default defineComponent({
+  name: 'App',
 })
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* text-align: center; */
-  color: #2c3e50;
-}
-</style>
+<script lang="ts" setup>
+import Sortable, { SortableEvent } from 'sortablejs'
+import { onMounted, ref, nextTick, watch } from 'vue'
+import { IDomTree, useDomTreeStore, useWidgetsStore } from './store'
+import { useRender, useRenderDom } from './hooks/render'
+import { v4 as uuidv4 }from 'uuid'
+import { domToTree, isEmpty } from './util/tools'
 
-<style scoped>
-.edit-area {
-  min-width: 500px;
-  min-height: 400px;
-  border: 1px solid #ddd;
+const treeProps = ref({
+  label: 'tag',
+})
+
+const treeNode = ref([])
+const widgetsStore = useWidgetsStore();
+const domTree = useDomTreeStore()
+const dropRef = ref();
+const treeRef = ref();
+
+onMounted(() => {
+  useRenderDom(dropRef.value, treeNode.value);
+  bindDragBox()
+})
+watch(() => treeNode.value, (nodes) => {
+  useRenderDom(dropRef.value, nodes);
+  nextTick().then(() => {
+    bindDragBox();
+  })
+}, { deep: true })
+function handleNodeDrop() {
+  useRenderDom(dropRef.value, treeNode.value);
 }
-.item-config {
-  position: sticky;
-  top: 0;
+function findWidget(toId: string, parent?: IDomTree): [IDomTree | null, IDomTree] {
+  const list = parent? parent.children : domTree.domTree;
+  for (let widget of list) {
+    if (widget.id === toId) {
+      return [parent || null, widget]
+    }
+    if (!isEmpty(widget.children)) {
+      const res = findWidget(toId, widget)
+      if (res.length > 0) {
+        return res;
+      }
+    }
+  }
+  return [] as any
 }
+function insertWidget(node: IDomNode, toId?: string, nextId?: string | null) {
+  if (nextId) {
+    treeRef.value.insertBefore(node, nextId)
+  } else {
+    treeRef.value.append(node, toId)
+  }
+}
+// function insertWidget(parent: IDomTree[] = domTree.domTree, widgetEl: HTMLElement) {
+//   const nextEl = widgetEl.nextElementSibling as HTMLElement | null
+//   const widget = widgetEl.dataset;
+//   const widgetObj = {
+//     id: widget.id!,
+//     tag: widget.tag!,
+//     children: [],
+//   }
+//   if (nextEl) {
+//     const { id } = nextEl.dataset;
+//     const insertIndex = parent.findIndex(item => item.id === id);
+//     parent.splice(insertIndex, 0, widgetObj)
+//   } else {
+//     parent.push(widgetObj)
+//   }
+// }
+
+function removeNode(nodeKey: string) {
+  const removeNode = treeRef.value.getNode(nodeKey);
+  treeRef.value.remove(nodeKey);
+  return removeNode;
+}
+
+function switchWidget(originId: string, drop: SortableEvent) {
+  const to = drop.to
+  const toId = to.dataset.id
+  const nextId = getWidgetId(drop.item.nextElementSibling as HTMLElement)
+
+  const nodeRemoved = removeNode(originId);
+  if (!nextId) {
+    treeRef.value.append(nodeRemoved.data, toId)
+  }
+}
+// function switchWidget(
+//   origin: IDomTree[] = domTree.domTree,
+//   // target: IDomTree[] = domTree.domTree,
+//   event: SortableEvent,
+//   toId: string
+// ) {
+//   const widgetEl = event.item;
+//   const nextEl = widgetEl.nextElementSibling;
+
+//   // debugger;
+//   const originId = getWidgetId(widgetEl)
+
+//   const originIndex = origin.findIndex(item => item.id === originId)
+//   const obj = origin.splice(originIndex, 1);
+//   if (!nextEl) {
+//     const [parent, toWidget] = findWidget(toId)
+//     const list = toId ? toWidget.children : parent?.children ?? domTree.domTree;
+//     list.push(...obj)
+//   } else {
+//     const toId = getWidgetId(nextEl as HTMLElement)
+//     const [toWidget] = findWidget(toId!)
+//     const target = toWidget?.children ?? domTree.domTree;
+//     const targetIndex = target.findIndex(item => item.id === toId);
+//     target.splice(targetIndex, 0, ...obj);
+//   }
+//   // const targetIndex = (toId ? target : domTree.domTree).findIndex(item => item.id === toId)
+//   // target.splice(targetIndex, 0, ...obj);
+// }
+
+function getWidgetId(el?: HTMLElement) {
+  if (!el) {
+    return null;
+  }
+  let id = el.dataset.id;
+  if (!id) {
+    id = (el.children[0] as HTMLElement).dataset.id;
+  }
+  return id;
+}
+
+const hasChange = ref(false)
+
+function renderer() {
+  useRender(dropRef.value)
+}
+
+function createDomNode(tag: keyof typeof widgetsStore.$state): IDomNode {
+  const id = uuidv4();
+  const config = widgetsStore.$state[tag];
+  if (config.snippets) {
+    return domToTree(config.snippets);
+  }
+  return {
+    id,
+    tag,
+    attrs: config.attrs,
+    snippets: config.snippets,
+    childre: [],
+  }
+}
+
+function bindDragBox() {
+  const widgets = document.querySelectorAll('.widget-box');
+  const boxs = document.querySelectorAll('.drag-box, .el-form-item__content');
+  widgets.forEach(item => {
+    Sortable.create(item as HTMLElement, {
+      group: {
+        name: 'group',
+        pull: 'clone',
+        put: false,
+      },
+      sort: false,
+      onEnd(el) {
+        console.log(el.to)
+        // if (!hasChange.value) {
+        //   return;
+        // }
+        // hasChange.value = false;
+
+        let toId = el.to.dataset.id;
+        if (!toId) {
+          toId = el.to.parentElement?.dataset.id
+        }
+        const nodes = createDomNode(el.item.dataset.tag as any);
+        const nextId = getWidgetId(el.item.nextElementSibling as HTMLElement)
+        insertWidget(nodes, toId, nextId);
+        el.item.dataset.id = nodes.id;
+      },
+      onChange() {
+        hasChange.value = true;
+      },
+      onAdd(ev) {
+        console.log('add', ev)
+      }
+    });
+  })
+  boxs.forEach(item => {
+    Sortable.create(item as HTMLElement, {
+      sort: false,
+      draggable: '.draggable',
+      group: {
+        name: 'group'
+      },
+      onChange() {
+        hasChange.value = true;
+      },
+      onEnd(ev) {
+        if (!hasChange.value) {
+          return;
+        }
+        hasChange.value = false;
+        // const nextEl = ev.item.nextElementSibling || ev.to;
+        let toId = ev.to.dataset.id;
+        if (!toId) {
+          toId = ev.to.parentElement?.dataset.id;
+        }
+        let originId = ev.item.dataset.id;
+        if (!originId) {
+          originId = (ev.item.children[0] as HTMLElement).dataset.id;
+        }
+        switchWidget(originId!, ev)
+        // const [toPar] = findWidget(toId!)!;
+        // const [originPar] = findWidget(originId!)!
+        // switchWidget(originPar?.children, ev, toId!)
+        // useRender(dropRef.value)
+        // nextTick().then(() => {
+        //   bindDragBox();
+        // })
+      }
+    })
+  })
+}
+</script>
+
+<style lang="scss" scoped>
 .drop-area {
+  padding: 10px;
   width: 1000px;
-  height: 400px;
-  border: 1px solid #ccc;
+  min-height: 400px;
+  border: 1px solid #d9d9d9;
 }
 </style>
 
 <style lang="scss">
-.mask {
-  cursor: move;
-  position: relative;
-  &::after {
-    content: '';
-    display: block;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
+.form-wrap {
+  min-height: 60px;
+  border: 1px solid crimson;
+}
+.layout-col {
+  min-height: 60px;
+  border: 1px solid green;
+  padding: 10px;
+}
+.layout-row {
+  padding: 10px;
+  min-height: 60px;
+  border: 1px solid powderblue;
+}
+.sortable-ghost {
+  overflow: hidden;
+  background: #409EFF;
+  padding: 0 !important; 
+  min-height: 0px !important;
+  height: 0;
+  outline: 1px solid #1861d5!important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 1000;
+  * {
+    display: none !important;
   }
 }
-
 </style>

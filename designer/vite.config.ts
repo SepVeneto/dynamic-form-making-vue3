@@ -16,5 +16,19 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src')
     }
   },
-  plugins: [vue(), vueJsx()]
+  plugins: [vue({
+    template: {
+        compilerOptions: {
+          // 将所有包含短横线的标签作为自定义元素处理
+          isCustomElement: tag => {
+            return tag.startsWith('bc-') || tag === 'drag-wrap'
+          }
+        }
+      }
+    }
+  ), vueJsx({
+    isCustomElement: tag => {
+      return tag.startsWith('bc-') || tag === 'drag-wrap'
+    }
+  })]
 })

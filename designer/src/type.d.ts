@@ -16,6 +16,15 @@ declare interface Cell {
   label: string,
   prop: string,
   component?: any,
+  container?: boolean,
 }
 
 declare const ace: any
+
+declare interface IDomNode {
+  id: string,
+  tag: string,
+  snippets: string,
+  attrs: Record<string, any>,
+  childre: IDomNode[],
+}
