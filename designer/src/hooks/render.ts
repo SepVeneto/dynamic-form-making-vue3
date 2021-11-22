@@ -1,8 +1,10 @@
-import { createApp, defineComponent, nextTick, ref } from 'vue'
+import { createApp, defineComponent, nextTick, ref, watch } from 'vue'
+import {createPinia} from 'pinia'
 import type { App } from 'vue'
 import ElementPlus from 'element-plus'
 import { IDomTree, useDomTreeStore, useWidgetsStore } from '@/store'
 import { domToTree } from '@/util/tools'
+import Pinia from '@/store/index'
 
 let app: App | null
 function renderDomTree(domTree: IDomTree[], widgets: ReturnType<typeof useWidgetsStore>) {
@@ -60,8 +62,18 @@ function renderDom(nodeList: any[]): any {
       const nodes = domToTree(item.snippets)
       return renderDom([nodes])
     }
-    return `<${item.tag} data-id="${item.id}" v-bind='${JSON.stringify(item.attrs)}'>${item.textContent ?? ''}${renderDom(item.children)}</${item.tag}>`
+    return wrapDom(`<${item.tag}>${item.textContent ?? ''}${renderDom(item.children)}</${item.tag}>`, item)
   }).join('')
+}
+function wrapDom(node: string, config: IDomNode) {
+  const classes = config.attrs.class.split(' ').map((item: any) => `'${item}'`);
+  classes.push(`{'is-active': domTree.active === '${config.id}'}`)
+  const code = `<div :class="[${
+    classes.join(',')
+  }]" data-id="${
+    config.id
+  }" style="${config.attrs.style}"><i class="handle"></i>${node}</div>`
+  return code;
 }
 export function useRenderDom(el: HTMLElement, tree: any) {
   const template = renderDom(tree);
@@ -71,8 +83,10 @@ export function useRenderDom(el: HTMLElement, tree: any) {
   const comp= defineComponent({
     template,
     setup: () => {
+      const domTree = useDomTreeStore()
       const formData = ref({});
       return {
+        domTree,
         formData,
       }
     }
@@ -82,7 +96,7 @@ export function useRenderDom(el: HTMLElement, tree: any) {
     app = null
   }
   app = createApp(comp);
-  app.use(ElementPlus)
+  app.use(ElementPlus).use(Pinia)
   nextTick().then(() => {
     app!.mount(el)
   })

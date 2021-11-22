@@ -35,7 +35,7 @@
       default-expand-all
     >
     </el-tree>
-    <div class="drag-box drop-area" ref="dropRef">
+    <div class="drag-box drop-area" ref="dropRef" @click="handleClick">
     </div>
     <el-tabs style="flex:1">
       <el-tab-pane label="表单配置">
@@ -45,7 +45,13 @@
           </el-form-item>
         </el-form>
       </el-tab-pane>
-      <el-tab-pane label="表单域配置"></el-tab-pane>
+      <el-tab-pane label="表单域配置">
+        <el-form>
+          <el-form-item label="label">
+            <el-input v-model="nodeConfig.attrs.label" />
+          </el-form-item>
+        </el-form>
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -85,6 +91,26 @@ watch(() => treeNode.value, (nodes) => {
     bindDragBox();
   })
 }, { deep: true })
+
+const nodeConfig = ref({
+  attrs: { class: '', label: ''},
+})
+
+function handleClick(ev: MouseEvent) {
+  const { target } = ev;
+  let nodeId;
+  if ((target as HTMLElement)?.classList.contains('draggable')) {
+    const node = target as HTMLElement
+    nodeId = getWidgetId(node);
+    nodeConfig.value = treeRef.value.getNode(nodeId).data
+  } else {
+    const node = target as HTMLElement
+    nodeId = node?.parentElement &&  getWidgetId(node.parentElement);
+    nodeId && (nodeConfig.value = treeRef.value.getNode(nodeId)?.data)
+  }
+  !!nodeId && (domTree.active = nodeId);
+  
+}
 function handleNodeDrop() {
   useRenderDom(dropRef.value, treeNode.value);
 }
@@ -206,7 +232,7 @@ function createDomNode(tag: keyof typeof widgetsStore.$state): IDomNode {
 
 function bindDragBox() {
   const widgets = document.querySelectorAll('.widget-box');
-  const boxs = document.querySelectorAll('.drag-box, .el-form-item__content');
+  const boxs = document.querySelectorAll('.drag-box, .el-row, .el-form-item__content, .el-form');
   widgets.forEach(item => {
     Sortable.create(item as HTMLElement, {
       group: {
@@ -241,6 +267,7 @@ function bindDragBox() {
   })
   boxs.forEach(item => {
     Sortable.create(item as HTMLElement, {
+      handle: '.handle',
       sort: false,
       draggable: '.draggable',
       group: {
@@ -313,6 +340,25 @@ function bindDragBox() {
   z-index: 1000;
   * {
     display: none !important;
+  }
+}
+.drag-box {
+  position: relative;
+}
+.handle {
+  display: none;
+  background-image: url('@/assets/move.svg');
+  background-size: 100% 100%;
+  width: 20px;
+  height: 20px;
+  cursor: move;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.drag-box.is-active {
+  > .handle {
+    display: inline-block;
   }
 }
 </style>

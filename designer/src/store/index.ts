@@ -1,4 +1,7 @@
-import { defineStore } from "pinia";
+import { defineStore, createPinia } from "pinia";
+
+const pinia = createPinia();
+export default pinia;
 
 export interface IDomTree {
   id: string,
@@ -38,14 +41,14 @@ export const useWidgetsStore = defineStore('widgets', {
     'el-col': {
       snippets: '',
       attrs: {
-        class: 'drag-box layout-col',
+        class: 'drag-box draggable layout-col',
         span: 12
       }
     },
     'el-row': {
       snippets: '',
       attrs: {
-        class: 'draggable layout-row'
+        class: 'drag-box draggable layout-row'
       }
     },
     Layout: {
@@ -56,7 +59,8 @@ export const useWidgetsStore = defineStore('widgets', {
 })
 
 export const useDomTreeStore = defineStore('domTree', {
-  state: (): { domTree: IDomTree[] } => ({
+  state: (): { active: string, domTree: IDomTree[] } => ({
+    active: '',
     domTree: []
   }),
 })
