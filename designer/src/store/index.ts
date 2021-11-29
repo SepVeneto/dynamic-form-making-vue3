@@ -13,54 +13,58 @@ export interface IDomTree {
 export const useWidgetsStore = defineStore('widgets', {
   state: () => ({
     'el-input': {
-      snippets: `<el-input />`,
+      type: 'component',
+      snippets: ``,
       attrs: {},
     },
     'el-form': {
       snippets: '',
-      attrs: {
-        class: 'form-wrap drag-box draggable',
-        style: 'padding: 10px'
-      }
+      type: 'layout',
+      attrs: {}
     },
     'el-form-item': {
       snippets: '',
+      type: 'layout',
+      style: 'background: #fff',
       attrs: {
-        class: 'form-wrap drag-box draggable',
-        style: 'padding: 10px; border-color: blue',
-        label: '示例文本'
+        label: '示例文本',
       }
     },
-    'el-select': { attrs: {}, snippets: '', },
+    'el-select': {
+      type: 'component',
+      attrs: {},
+      snippets: '',
+    },
     span: {
+      type: 'component',
       snippets: '<span>示例文本</span>',
-      attrs: {
-        class: 'draggable',
-      }
+      attrs: {}
     },
     'el-col': {
+      type: 'layout',
+      style: 'background: #fff',
+      skip: true,
       snippets: '',
       attrs: {
-        class: 'drag-box draggable layout-col',
         span: 12
       }
     },
     'el-row': {
+      type: 'layout',
       snippets: '',
-      attrs: {
-        class: 'drag-box draggable layout-row'
-      }
+      attrs: {}
     },
     Layout: {
       attrs: {},
-      snippets: `<el-row><el-col></el-col></el-row>`
+      snippets: `<el-row><el-col></el-col><el-col /></el-row>`
     }
   })
 })
 
 export const useDomTreeStore = defineStore('domTree', {
-  state: (): { active: string, domTree: IDomTree[] } => ({
+  state: (): { active: string, domTree: IDomTree[], treeRef: any } => ({
     active: '',
+    treeRef: '',
     domTree: []
   }),
 })

@@ -24,7 +24,10 @@ declare const ace: any
 declare interface IDomNode {
   id: string,
   tag: string,
-  snippets: string,
+  skip?: boolean,
+  type: 'layout' | 'component',
+  style?: string,
+  snippets?: string,
   attrs: Record<string, any>,
-  childre: IDomNode[],
+  children: IDomNode[],
 }

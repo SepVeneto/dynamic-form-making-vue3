@@ -17,13 +17,16 @@
     "basic-components": "file:lib\\basic-components-1.0.0.tgz"
   },
   "dependencies": {
+    "@types/js-beautify": "^1.13.3",
+    "@types/prettier": "^2.4.2",
     "@types/sortablejs": "^1.10.7",
     "@types/uuid": "^8.3.1",
     "dragula": "^3.7.3",
     "dropzone": "^6.0.0-beta.1",
+    "js-beautify": "^1.14.0",
     "pinia": "^2.0.3",
+    "prettier": "^2.4.1",
     "sortablejs": "^1.14.0",
-    "storablejs": "^0.0.20",
     "uuid": "^8.3.2"
   }
 }
