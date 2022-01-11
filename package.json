@@ -14,8 +14,10 @@
     "gh-pages": "git subtree push --prefix designer/dist origin gh-pages"
   },
   "dependencies": {
+    "@vue/compiler-sfc": "^3.2.23",
     "element-plus": "^1.1.0-beta.18",
     "slate": "^0.66.5",
+    "ufo": "^0.7.9",
     "vue": "^3.2.16",
     "vuedraggable": "^4.1.0"
   },

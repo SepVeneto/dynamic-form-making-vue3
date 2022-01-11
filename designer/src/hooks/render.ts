@@ -103,12 +103,18 @@ export function useRenderDom(el: HTMLElement, tree: any) {
     setup: () => {
       const domTree = useDomTreeStore()
       const formData = ref({});
+      function copyWidget(config: IDomNode) {
+        config.id = uuidv4();
+        config.children.forEach(item => {
+          copyWidget(item);
+        })
+      }
       function handleCopy(id: string) {
         const node = domTree.treeRef.getNode(id);
         const parentId = node.parent?.data.id
-        domTree.treeRef.append({ ...JSON.parse(JSON.stringify(node.data)), id: uuidv4() }, parentId);
-        // console.log(node.data, node.id, node.parent.id)
-        // console.log(domTree.treeRef, id)
+        const cloneNode = JSON.parse(JSON.stringify(node.data));
+        copyWidget(cloneNode)
+        domTree.treeRef.append(cloneNode, parentId);
       }
       function handleDelete(id: string) {
         domTree.treeRef.remove(id)
@@ -127,6 +133,7 @@ export function useRenderDom(el: HTMLElement, tree: any) {
     app = null
   }
   app = createApp(comp);
+  app.component(tree[0].tag, tree[0].code)
   app.use(ElementPlus).use(Pinia)
   nextTick().then(() => {
     app!.mount(el)

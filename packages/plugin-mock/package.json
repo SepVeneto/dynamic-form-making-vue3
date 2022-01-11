@@ -1,0 +1,15 @@
+{
+  "name": "vite-plugin-mock",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vue/compiler-sfc": "^3.2.23",
+    "ufo": "^0.7.9"
+  }
+}

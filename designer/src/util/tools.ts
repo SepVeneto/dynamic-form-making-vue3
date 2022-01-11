@@ -8,10 +8,11 @@ export function isEmpty(obj: Record<string, any>) {
 export function domToTree(dom: string): IDomNode {
   const widgetsStore = useWidgetsStore();
   const root = document.createElement('div');
-  root.innerHTML = dom;
+  root.innerHTML = dom.match(/<template>[\n\s]*([\n\s\S]*)<\/template>/)?.[1] ?? dom;
+  console.log(root)
   const parseDom = (el: HTMLElement) => {
     const tag = el.tagName.toLowerCase();
-    const config = widgetsStore.$state[tag as keyof typeof widgetsStore.$state];
+    const config = widgetsStore.repo[tag as keyof typeof widgetsStore.repo];
     const obj: any = {
       id: uuidv4(),
       tag,

@@ -1,0 +1,42 @@
+[
+  {
+    "label": "容器",
+    "comps": [
+      {
+        "tag": "el-row"
+      },
+      {
+        "tag": "el-col"
+      },
+      {
+        "label": "栅格",
+        "snippets": ""
+      }
+    ]
+  },
+  {
+    "label": "组件",
+    "comps": [
+      {
+        "label": "表单",
+        "tag": "el-form"
+      },
+      {
+        "label": "表单域",
+        "tag": "el-form-item"
+      },
+      {
+        "label": "输入框",
+        "tag": "el-input"
+      },
+      {
+        "label": "选择器",
+        "tag": "el-select"
+      },
+      {
+        "label": "文本",
+        "tag": "span"
+      }
+    ]
+  }
+]

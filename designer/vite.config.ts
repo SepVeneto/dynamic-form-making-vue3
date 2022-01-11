@@ -1,13 +1,16 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
+// import pluginMock from 'vite-plugin-mock'
+import pluginMock from '../packages/plugin-mock'
 import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/dynamic-form-making-vue3/',
+  // base: '/__designer/',
   server: {
     fs: {
-      strict: true,
+      strict: false,
     }
   },
   resolve: {
@@ -30,5 +33,5 @@ export default defineConfig({
     isCustomElement: tag => {
       return tag.startsWith('bc-') || tag === 'drag-wrap'
     }
-  })]
+  }), pluginMock()]
 })

@@ -29,6 +29,9 @@
       <div class="widget-box">
         <span data-tag="Layout" data-type="layout">栅格</span>
       </div>
+      <div class="widget-box">
+        <span data-tag="form-item" data-type="comp">form-item</span>
+      </div>
     </div>
     <el-tree
       ref="treeRef"
@@ -77,11 +80,13 @@ import parseVue from 'prettier/parser-html';
 // import beautify from "js-beautify";
 import RenderConfig from './renderConfig';
 import Sortable, { SortableEvent } from 'sortablejs';
-import { onMounted, ref, nextTick, watch } from 'vue';
+import { onMounted, ref, nextTick, watch, shallowRef, reactive } from 'vue';
 import { IDomTree, useDomTreeStore, useWidgetsStore } from './store';
 import { useRender, useRenderDom } from './hooks/render';
 import { v4 as uuidv4 } from 'uuid';
 import { domToTree, isEmpty } from './util/tools';
+import configure from './config.json'
+import { useFetch } from './hooks/hooks';
 
 const treeProps = ref({
   label: 'tag',
@@ -94,6 +99,12 @@ const dropRef = ref();
 const treeRef = ref();
 const codeCont = ref();
 
+const res = reactive(useFetch('/mock-api/el-form').get().json());
+setTimeout(() => {
+  console.log(res.data.tag)
+  widgetsStore.repo[res.data.tag] = res.data;
+  console.log(widgetsStore.repo)
+}, 1000)
 onMounted(() => {
   useRenderDom(dropRef.value, treeNode.value);
   domTree.treeRef = treeRef.value;
@@ -289,15 +300,16 @@ function getWidgetId(el?: HTMLElement) {
 
 const hasChange = ref(false);
 
-function createDomNode(tag: keyof typeof widgetsStore.$state): IDomNode {
+function createDomNode(tag: keyof typeof widgetsStore.repo): IDomNode {
   const id = uuidv4();
-  const config = widgetsStore.$state[tag];
+  const config = widgetsStore.repo[tag];
   if (config.snippets) {
     return domToTree(config.snippets);
   }
   return {
     id,
     tag,
+    code: config.code,
     skip: (config as any).skip,
     type: (config as any).type,
     style: (config as any).style,

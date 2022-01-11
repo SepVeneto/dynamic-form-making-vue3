@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="Zh-Cn">
-
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" />
@@ -9,13 +8,17 @@
   </head>
   <body>
     <script>
-    // polyfill global
-    if (typeof window.global === 'undefined') {
-      window.global = window;
-    }
+      // polyfill global
+      if (typeof window.global === 'undefined') {
+        window.global = window;
+      }
     </script>
     <div id="app"></div>
-    <script src="https://pagecdn.io/lib/ace/1.4.12/ace.min.js" crossorigin="anonymous" integrity="sha256-T5QdmsCQO5z8tBAXMrCZ4f3RX8wVdiA0Fu17FGnU1vU=" ></script>
+    <script
+      src="https://pagecdn.io/lib/ace/1.4.12/ace.min.js"
+      crossorigin="anonymous"
+      integrity="sha256-T5QdmsCQO5z8tBAXMrCZ4f3RX8wVdiA0Fu17FGnU1vU="
+    ></script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
