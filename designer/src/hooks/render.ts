@@ -11,7 +11,8 @@ let app: App | null
 function renderDomTree(domTree: IDomTree[], widgets: ReturnType<typeof useWidgetsStore>) {
   let res = '';
   Object.entries(domTree).forEach(([, widget]) => {
-    const attrs = widgets ? widgets[widget.tag as keyof typeof widgets.$state].attrs : (widget.attributes ?? {});
+    let attrs = widgets ? widgets[widget.tag as keyof typeof widgets.$state].attrs : (widget.attributes ?? {});
+    console.log(attrs, JSON.stringify(attrs ?? {}))
     const element = `<${widget.tag} data-id="${widget.id}" v-bind='${JSON.stringify(attrs ?? {})}'></${widget.tag}>`;
     res += widget.children ?
       element.replace(/><\//, `>${renderDomTree(widget.children, widgets)}</`) :
@@ -60,16 +61,38 @@ function renderDom(nodeList: any[]): any {
       return renderDom([nodes])
     }
     let classes = item.type === 'component' ? ['draggable', 'comp-wrap'] : ['drag-box', 'draggable', 'layout-wrap'];
+
+    const attrMap = Object.entries<string>(item.attrs).map(([key, val]) => {
+      if (key.includes('v-model')) {
+        const [, prop] = key.split(':')
+        const propName = prop ?? 'modelValue'
+        return [[propName, val], [`'onUpdate:${propName}'`, `(val) => ${val} = val`]]
+      } else if (key.startsWith(':')) {
+        return [key.slice(1), val]
+      }
+      return [key, `'${val}'`]
+    })
+    let attrs = Object.fromEntries(attrMap.flatMap<any>((item: string[]| string[][]) => {
+      if (item.some((each: string | string[]) => Array.isArray(each))) {
+        return item
+      } else {
+        return [item]
+      }
+    }))
+
+    attrs = JSON.stringify(attrs).replaceAll('"', '') as any
+    console.log(attrs)
+
     // classes = classes.map(item => `${item}`);
     return item.skip ?
     `<${item.tag} class="${
       classes.join(' ')
     }" style="${
       item.style
-    }" data-id="${item.id}" data-skip="${item.skip}" v-bind='${
-      JSON.stringify(item.attrs)
-    }'>${item.textContent ?? ''}${renderDom(item.children)}</${item.tag}>` :
-    wrapDom(`<${item.tag} v-bind='${JSON.stringify(item.attrs)}'>${item.textContent ?? ''}${renderDom(item.children)}</${item.tag}>`, item)
+    }" data-id="${item.id}" data-skip="${item.skip}" v-bind="${
+      attrs
+    }">${item.textContent ?? ''}${renderDom(item.children)}</${item.tag}>` :
+    wrapDom(`<${item.tag} v-bind="${attrs}">${item.textContent ?? ''}${renderDom(item.children)}</${item.tag}>`, item)
   }).join('')
 }
 function wrapDom(node: string, config: IDomNode) {

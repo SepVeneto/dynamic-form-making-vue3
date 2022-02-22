@@ -25,6 +25,7 @@
     "@types/sortablejs": "^1.10.7",
     "@types/uuid": "^8.3.1",
     "@vue/compiler-sfc": "^3.2.23",
+    "axios": "^0.26.0",
     "basic-components": "file:lib\\basic-components-1.0.3.tgz",
     "dragula": "^3.7.3",
     "dropzone": "^6.0.0-beta.1",

@@ -5,7 +5,7 @@ export interface ConfigType {
   type: ResponseType,
   method: FetchMethodType
 }
-export function useFetch(url: string) {
+export function useFetch(url: string, options: Record<string, any> = {}) {
   const data = shallowRef({})
   const config: ConfigType = {
     type: 'text',
@@ -13,7 +13,7 @@ export function useFetch(url: string) {
   }
   const execute = () => {
     return new Promise(resolve => {
-      fetch(url).then(async response => {
+      fetch(url, { ...config, ...options }).then(async response => {
         const res = await response[config.type]()
         data.value = res;
         resolve(response);
@@ -22,6 +22,7 @@ export function useFetch(url: string) {
   }
   const shell: any = {
     data,
+    post: setMethod('post'),
     get: setMethod('get'),
     json: setType('json'),
   }

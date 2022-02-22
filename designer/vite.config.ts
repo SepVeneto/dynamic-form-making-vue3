@@ -9,6 +9,12 @@ export default defineConfig({
   base: '/dynamic-form-making-vue3/',
   // base: '/__designer/',
   server: {
+    proxy: {
+      '/api' : {
+        target: 'http://localhost:7777',
+        changeOrigin: true,
+      }
+    },
     fs: {
       strict: false,
     }

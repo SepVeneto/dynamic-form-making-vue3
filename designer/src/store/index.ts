@@ -18,6 +18,11 @@ export const useWidgetsStore = defineStore('widgets', {
         snippets: ``,
         attrs: {},
       },
+      'bc-input': {
+        type: 'component',
+        snippets: ``,
+        attrs: {},
+      },
       'el-form': {
         snippets: '',
         type: 'layout',
@@ -36,6 +41,11 @@ export const useWidgetsStore = defineStore('widgets', {
         attrs: {},
         snippets: '',
       },
+      'bc-select': {
+        type: 'component',
+        attrs: {},
+        snippets: '',
+      },
       span: {
         type: 'component',
         snippets: '<span>示例文本</span>',
@@ -47,7 +57,7 @@ export const useWidgetsStore = defineStore('widgets', {
         skip: true,
         snippets: '',
         attrs: {
-          span: 12
+          ':span': 12
         }
       },
       'el-row': {

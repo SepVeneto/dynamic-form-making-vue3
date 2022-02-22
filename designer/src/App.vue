@@ -2,6 +2,7 @@
   <div>
     <el-button type="text" @click="handlePreview">预览</el-button>
     <el-button type="text" @click="handleShowCode">代码</el-button>
+    <el-button type="text" @click="handleFormExtract">表单提取</el-button>
   </div>
   <div style="display: flex; column-gap: 20px; margin: 0 100px">
     <div class="widget-area">
@@ -64,6 +65,9 @@
     </el-tabs>
   </div>
   <pre><code>{{text}}</code></pre>
+  <el-input v-model="code" type="textarea" />
+  <el-button type="primary" @click="handleRender">渲染</el-button>
+  <form-extract v-if="visible" />
 </template>
 
 <script lang="ts">
@@ -74,6 +78,7 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
+import formExtract from './formExtract.vue'
 // import prettyhtml from '@starptech/prettyhtml'
 import prettier from 'prettier/standalone';
 import parseVue from 'prettier/parser-html';
@@ -98,6 +103,9 @@ const domTree = useDomTreeStore();
 const dropRef = ref();
 const treeRef = ref();
 const codeCont = ref();
+const visible = ref(false)
+const code = ref()
+const test = ref()
 
 const res = reactive(useFetch('/mock-api/el-form').get().json());
 setTimeout(() => {
@@ -113,6 +121,7 @@ onMounted(() => {
 watch(
   () => treeNode.value,
   (nodes) => {
+    console.log(nodes)
     useRenderDom(dropRef.value, nodes);
     nextTick().then(() => {
       bindDragBox();
@@ -126,6 +135,15 @@ const nodeConfig = ref({
   attrs: { class: '', label: '' },
 });
 const text = ref();
+
+function handleRender() {
+  const node = domToTree(code.value)
+  console.log(node)
+  treeRef.value.append(node);
+}
+function handleFormExtract() {
+  visible.value = true;
+}
 function handleShowCode() {
   text.value = prettier.format(`<template>${codeCont.value}</template>`, {
     htmlWhitespaceSensitivity: 'ignore',
